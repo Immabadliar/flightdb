@@ -1,33 +1,78 @@
 const express = require('express');
 const mysql = require('mysql2');
-const bcrypt = require('bcrypt');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, '..'))); // Serve static files from the root
 
-// MySQL URI connection string
-const dbUri = 'mysql://49YQ4o6FcT48Ja4.root:7MOuMnsfcWag9TSI@gateway01.us-east-1.prod.aws.tidbcloud.com:4000/test';
-
-// Create connection using the URI
-const connection = mysql.createConnection(dbUri);
+const connection = mysql.createConnection({
+    host: 'gateway01.us-east-1.prod.aws.tidbcloud.com',
+    port: 4000,
+    user: '49YQ4o6FcT48Ja4.root',
+    password: 'X4LAjcGlc4Vdfzh3',
+    database: 'test',
+    ssl: {
+        ca: fs.readFileSync(path.join(__dirname, 'isrgrootx1.pem')),
+        rejectUnauthorized: true
+    }
+});
 
 connection.connect(err => {
     if (err) {
         console.error('Database connection error:', err);
     } else {
         console.log('Connected to TiDB!');
+        initializeDatabase();
     }
 });
 
-// Route for user registration (hashing password with bcrypt)
-app.post('/login', async (req, res) => {
+function initializeDatabase() {
+    connection.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL
+        )
+    `, (err) => {
+        if (err) {
+            console.error('Failed to create users table:', err);
+        } else {
+            console.log('Users table ready.');
+        }
+    });
+}
+
+app.post('/register', (req, res) => {
     const { username, password } = req.body;
 
-    connection.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
+    connection.query(
+        'INSERT INTO users (username, password) VALUES (?, ?)',
+        [username, password],
+        (err, results) => {
+            if (err) {
+                console.error('Registration error:', err);
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ message: 'Username already exists' });
+                }
+                return res.status(500).json({ message: 'Database error' });
+            }
+
+            res.json({ message: 'User registered successfully' });
+        }
+    );
+});
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    connection.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
         if (err) {
-            return res.status(500).json({ message: 'Database error during login', error: err.message });
+            console.error('Database query error:', err);
+            return res.status(500).json({ message: 'Database error' });
         }
 
         if (results.length === 0) {
@@ -36,24 +81,14 @@ app.post('/login', async (req, res) => {
 
         const user = results[0];
 
-        // Compare the entered password with the stored hashed password
-        try {
-            const match = await bcrypt.compare(password, user.password);
-
-            if (match) {
-                res.json({ message: 'Login successful!' });
-            } else {
-                res.status(401).json({ message: 'Incorrect password' });
-            }
-        } catch (compareError) {
-            console.error('Error comparing passwords:', compareError);
-            res.status(500).json({ message: 'Error during password comparison', error: compareError.message });
+        if (password === user.password) {
+            res.json({ message: 'Login successful' });
+        } else {
+            res.status(401).json({ message: 'Incorrect password' });
         }
     });
 });
 
-
-// Start the server
 app.listen(5500, () => {
     console.log('Server running on http://localhost:5500');
 });

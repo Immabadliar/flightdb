@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.status === 200) {
                 // On successful login, load the next page
-                window.location.href = 'page.html';  // Make sure 'page.html' exists and is in the correct path
+                window.location.href = 'renderer/page.html';  // Make sure 'page.html' exists and is in the correct path
             }
         } catch (error) {
             console.error('Error during login:', error);

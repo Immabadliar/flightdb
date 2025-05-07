@@ -35,7 +35,8 @@ function initializeDatabase() {
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL
+            password VARCHAR(255) NOT NULL,
+            rank_id INT DEFAULT 0
         )
     `, (err) => {
         if (err) {
@@ -82,12 +83,26 @@ app.post('/login', (req, res) => {
         const user = results[0];
 
         if (password === user.password) {
-            res.json({ message: 'Login successful' });
+            res.json({
+                message: 'Login successful',
+                username: user.username,
+                rank_id: user.rank_id,
+                panel: getPanel(user.rank_id) // Add panel info
+            });
         } else {
             res.status(401).json({ message: 'Incorrect password' });
         }
     });
 });
+
+// Utility function to determine the panel based on rank_id
+function getPanel(rankId) {
+    if (rankId >= 255) return 'creator';
+    if (rankId >= 220) return 'dev';
+    if (rankId >= 190) return 'admin';
+    return 'user'; // Default to user access
+}
+
 
 app.listen(5500, () => {
     console.log('Server running on http://localhost:5500');

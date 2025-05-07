@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>USCG Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="navbar">
+    <h1>United States Coast Guard Control Panel</h1>
+    <nav>
+      <button onclick="showPanel('admin')">Admin Panel</button>
+      <button onclick="showPanel('dev')">Dev Panel</button>
+      <button onclick="showPanel('creator')">Creator Panel</button>
+    </nav>
+  </div>
+
+  <div class="panel-container">
+    <section id="admin" class="panel">
+      <h2>Admin Panel</h2>
+      <div class="panel-buttons">
+        <button onclick="viewUsers()">View All Users</button>
+        <button onclick="promoteDemote()">Promote/Demote Members</button>
+        <button onclick="resetPasswords()">Reset Passwords</button>
+        <button onclick="assignRanks()">Assign Ranks</button>
+      </div>
+    </section>
+
+    <section id="dev" class="panel">
+      <h2>Dev Panel</h2>
+      <div class="panel-buttons">
+        <button onclick="updateTools()">Update Group Tools</button>
+        <button onclick="viewLogs()">View Error Logs</button>
+        <button onclick="deployScripts()">Deploy Scripts</button>
+        <button onclick="managePermissions()">Manage Permissions</button>
+      </div>
+    </section>
+
+    <section id="creator" class="panel">
+      <h2>Creator Panel</h2>
+      <div class="panel-buttons">
+        <button onclick="viewOverview()">Total Access Overview</button>
+        <button onclick="manageDatabase()">Database Management</button>
+        <button onclick="userStats()">User Statistics</button>
+        <button onclick="controlLogs()">Control Panels & Logs</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function showPanel(panelId) {
+      document.querySelectorAll('.panel').forEach(panel => {
+        panel.style.display = 'none';
+      });
+      document.getElementById(panelId).style.display = 'block';
+    }
+
+    // Placeholder action functions
+    function viewUsers() { alert("Viewing all users..."); }
+    function promoteDemote() { alert("Promote/Demote members..."); }
+    function resetPasswords() { alert("Resetting passwords..."); }
+    function assignRanks() { alert("Assigning ranks..."); }
+
+    function updateTools() { alert("Updating group tools..."); }
+    function viewLogs() { alert("Viewing error logs..."); }
+    function deployScripts() { alert("Deploying scripts..."); }
+    function managePermissions() { alert("Managing permissions..."); }
+
+    function viewOverview() { alert("Viewing total access overview..."); }
+    function manageDatabase() { alert("Managing database..."); }
+    function userStats() { alert("Viewing user statistics..."); }
+    function controlLogs() { alert("Accessing control panels & logs..."); }
+
+    // Show only admin panel by default
+    showPanel('admin');
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0f172a;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #1e293b;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    nav button {
+      background-color: #334155;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin: 0.2rem;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    nav button:hover {
+      background-color: #475569;
+    }
+
+    .panel-container {
+      padding: 2rem;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel h2 {
+      margin-bottom: 1rem;
+    }
+
+    .panel-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .panel-buttons button {
+      background-color: #1e293b;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 5px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .panel-buttons button:hover {
+      background-color: #334155;
+    }
+  </style>
+</body>
+</html>
